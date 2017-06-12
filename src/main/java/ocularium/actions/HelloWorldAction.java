@@ -21,9 +21,11 @@ public class HelloWorldAction implements IPluginActionDelegate {
 			
 			RefactorFacade rf = new RefactorFacade(project);
 	        String className = JOptionPane.showInputDialog(window.getParent(), "Name the class to export the interface from: ");
-	        boolean result = rf.exportInterface(className);
+	        rf.initialize("C:/Users/15105189/Desktop/teste");
+	        String result = rf.exportInterface(className);
+	        JOptionPane.showMessageDialog(window.getParent(), result);
 	        
-	        if(result) JOptionPane.showMessageDialog(window.getParent(), "Successful interface creation.");
+	        if(result.equals("")) JOptionPane.showMessageDialog(window.getParent(), "Successful interface creation.");
 	        else JOptionPane.showMessageDialog(window.getParent(), "Failed interface creation.");
 	      } catch (Exception e) {
 	        JOptionPane.showMessageDialog(window.getParent(), "Exception occured", "Alert", JOptionPane.ERROR_MESSAGE);

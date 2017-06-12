@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
 import com.change_vision.jude.api.inf.editor.ModelEditorFactory;
@@ -503,9 +505,16 @@ public class RefactorFacade {
 		return prjAccessor.getProjectPath() + ".ocl";
 	}
 
-	public boolean exportInterface(String className) {
-		//TODO
-		return true;
+	public String exportInterface(String className) {
+		assert project != null;
+		INamedElement[] iNamedElements = project.getOwnedElements();
+        for (int i = 0; i < iNamedElements.length; i++) {
+            if (iNamedElements[i] instanceof IClass) {
+                IClass iClass = (IClass) iNamedElements[i];
+                return (iClass.getName());
+            }
+        }
+		return "";
 	}
 
 }
