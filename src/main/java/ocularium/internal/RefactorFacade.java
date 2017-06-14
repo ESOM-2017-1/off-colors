@@ -34,6 +34,7 @@ import javax.swing.JOptionPane;
 
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.editor.BasicModelEditor;
+import com.change_vision.jude.api.inf.editor.ClassDiagramEditor;
 import com.change_vision.jude.api.inf.editor.ModelEditorFactory;
 import com.change_vision.jude.api.inf.editor.TransactionManager;
 import com.change_vision.jude.api.inf.exception.InvalidEditingException;
@@ -43,6 +44,7 @@ import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IConstraint;
+import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.model.IModel;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.model.IOperation;
@@ -96,11 +98,13 @@ public class RefactorFacade {
             // Begin transaction when creating or editing models
             TransactionManager.beginTransaction();
 
+            
             // Get model editor to create models in a class diagram
             BasicModelEditor basicModelEditor = ModelEditorFactory.getBasicModelEditor();
 
             // Create a package
             IPackage packageA = basicModelEditor.createPackage(project, "PackageA");
+            
 
             // Create a class in the specified package
             IClass classA = basicModelEditor.createClass(packageA, "ClassA");
@@ -117,6 +121,9 @@ public class RefactorFacade {
             // Add an association between classes
             basicModelEditor.createAssociation(classA, classB, "association name",
                     "classA end", "classB end");
+            
+            ClassDiagramEditor cde = prjAccessor.getDiagramEditorFactory().getClassDiagramEditor();
+            IDiagram iClassDiagram = cde.createClassDiagram(packageA, "Class Diagram");
 
             // End transaction
             TransactionManager.endTransaction();

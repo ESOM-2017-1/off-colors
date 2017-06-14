@@ -21,7 +21,7 @@ public class HelloWorldAction implements IPluginActionDelegate {
 			
 			RefactorFacade rf = new RefactorFacade(project);
 	        String className = JOptionPane.showInputDialog(window.getParent(), "Name the class to export the interface from: ");
-	        rf.initialize("C:/Users/15105189/Desktop/teste");
+	        rf.initialize("C:/Users/15105189/Desktop/teste/teste.asta");
 	        String result = rf.exportInterface(className);
 	        JOptionPane.showMessageDialog(window.getParent(), result);
 	        

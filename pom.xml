@@ -269,11 +269,11 @@
 					<value>true</value>
 				</property>
 				<file>
-					<exists>/usr/lib/astah_professional/astah-pro.jar</exists>
+					<exists>C:\Program Files (x86)\astah-professional\astah-pro.jar</exists>
 				</file>
 			</activation>
 			<properties>
-				<astahPath>C:\Program Files\astah-community</astahPath>
+				<astahPath>C:\Program Files (x86)\astah-professional\</astahPath>
 			</properties>
 			<dependencies>
 				<dependency>
@@ -293,58 +293,7 @@
 			</dependencies>
 		</profile>
 		
-		<profile>
-			<id>Community</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-				<property>
-					<name>Community</name>
-					<value>true</value>
-				</property>
-				<file>
-					<exists>C:\Program Files\astah-community\astah-community.jar</exists>
-				</file>
-
-			</activation>
-			<properties>
-				<astahPath>C:\Program Files\astah-community</astahPath>
-			</properties>
-			<dependencies>
-				<dependency>
-					<groupId>com.change_vision.astah</groupId>
-					<artifactId>astah-api</artifactId>
-					<version>${astah.version}</version>
-					<scope>system</scope>
-					<systemPath>${astahPath}/astah-api.jar</systemPath>
-				</dependency>
-				<dependency>
-					<groupId>com.change_vision.astah</groupId>
-					<artifactId>astah-pro</artifactId>
-					<version>${astah.version}</version>
-					<scope>system</scope>
-					<systemPath>${astahPath}/astah-community.jar</systemPath>
-				</dependency>
-			</dependencies>
-			
-			<build>
-			<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.4.2</version>
-				<configuration>
-					<systemPropertyVariables>
-						<file.encoding>utf-8</file.encoding>
-					</systemPropertyVariables>
-					<excludes>
-						<exclude>**/ImportActionTest.java</exclude>
-					</excludes>
-					<argLine>-Dfile.encoding=UTF-8 -Xmx1024m -Xms128m</argLine>
-				</configuration>
-			</plugin>			
-			</plugins>
-			</build>			
-		</profile>
+		
 
 	</profiles>
 
