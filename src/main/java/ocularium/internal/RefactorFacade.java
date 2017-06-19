@@ -84,14 +84,8 @@ public class RefactorFacade {
 	 * 
 	 * @return
 	 */
-	public void initialize(String PROJECT_PATH){
+	public void initialize(){
 		try {
-            System.out.println("Creating new project...");
-
-            // Create a project and get a root model
-            ProjectAccessor prjAccessor = AstahAPI.getAstahAPI().getProjectAccessor();
-            prjAccessor.create(PROJECT_PATH);
-            IModel project = prjAccessor.getProject();
 
             System.out.println("Creating new elements in the project...");
 
@@ -121,27 +115,12 @@ public class RefactorFacade {
             // Add an association between classes
             basicModelEditor.createAssociation(classA, classB, "association name",
                     "classA end", "classB end");
-            
-            ClassDiagramEditor cde = prjAccessor.getDiagramEditorFactory().getClassDiagramEditor();
-            IDiagram iClassDiagram = cde.createClassDiagram(packageA, "Class Diagram");
 
             // End transaction
             TransactionManager.endTransaction();
 
-            // Save project
-            prjAccessor.save();
-
-            // Close project
-            prjAccessor.close();
-
             System.out.println("Finished");
 
-        } catch (LicenseNotFoundException e) {
-            e.printStackTrace();
-        } catch (ProjectNotFoundException e) {
-            e.printStackTrace();
-        } catch (ProjectLockedException e) {
-            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (InvalidEditingException e) {
@@ -149,8 +128,6 @@ public class RefactorFacade {
             TransactionManager.abortTransaction();
             // Get an exception message
             System.err.println(e.getMessage());
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         } catch (Throwable e) {
             e.printStackTrace();
@@ -512,16 +489,78 @@ public class RefactorFacade {
 		return prjAccessor.getProjectPath() + ".ocl";
 	}
 
-	public String exportInterface(String className) {
+	public void exportInterface(String className) {
 		assert project != null;
-		INamedElement[] iNamedElements = project.getOwnedElements();
-        for (int i = 0; i < iNamedElements.length; i++) {
-            if (iNamedElements[i] instanceof IClass) {
-                IClass iClass = (IClass) iNamedElements[i];
-                return (iClass.getName());
-            }
-        }
-		return "";
+		
+		exportInterface0(project, className);
+	}
+	
+	public void exportInterface0(INamedElement element, String className){
+		
+		if (element instanceof IPackage) {
+			for (INamedElement ownedNamedElement : ((IPackage) element).getOwnedElements()) {
+				exportInterface0(ownedNamedElement, className);
+			}
+		} else if (element instanceof IClass) {
+			//
+			IClass c = (IClass) element;
+
+//			if (!c.getName().equalsIgnoreCase(className)){
+//				for (IClass nestedClasses : ((IClass) element).getNestedClasses()) {
+//					exportInterface0(nestedClasses, className);
+//				}
+//				return;
+//			}
+			
+			for (IClass nestedClasses : ((IClass) element).getNestedClasses()) {
+				exportInterface0(nestedClasses, className);
+			}
+
+			try {
+
+	            // Begin transaction when creating or editing models
+	            TransactionManager.beginTransaction();
+
+	            
+	            
+	            // Get model editor to create models in a class diagram
+	            BasicModelEditor basicModelEditor = ModelEditorFactory.getBasicModelEditor();
+	            
+	            
+	            IClass iNewClass = basicModelEditor.createClass((IPackage)((IClass)element).getContainer(), "I"+c.getName());
+	            
+	            iNewClass.addStereotype("interface");
+	            
+	            for (IAttribute attribute : c.getAttributes()) {
+					basicModelEditor.createAttribute(iNewClass, attribute.getName(), attribute.getType());
+					basicModelEditor.delete(attribute);
+				}
+	            
+	            for (IOperation operation : c.getOperations()) {
+	            	basicModelEditor.createOperation(iNewClass, operation.getName(), operation.getReturnType());
+	            	basicModelEditor.delete(operation);
+				}
+	            
+	            basicModelEditor.createAssociation(c, iNewClass, "","","");
+	            
+	            // End transaction
+	            TransactionManager.endTransaction();
+
+	            System.out.println("Finished");
+
+	        } catch (ClassNotFoundException e) {
+	            e.printStackTrace();
+	        } catch (InvalidEditingException e) {
+	            // Abort transaction
+	            TransactionManager.abortTransaction();
+	            // Get an exception message
+	            System.err.println(e.getMessage());
+	            e.printStackTrace();
+	        } catch (Throwable e) {
+	            e.printStackTrace();
+	            
+	        }
+		}
 	}
 
 }
