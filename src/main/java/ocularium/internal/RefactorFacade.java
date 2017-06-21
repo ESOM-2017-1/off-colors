@@ -109,12 +109,6 @@ public class RefactorFacade {
             // Add an operation to the class
             basicModelEditor.createOperation(classA, "operation0", "void");
 
-            // Create a class in the specified package
-            IClass classB = basicModelEditor.createClass(packageA, "ClassB");
-
-            // Add an association between classes
-            basicModelEditor.createAssociation(classA, classB, "association name",
-                    "classA end", "classB end");
 
             // End transaction
             TransactionManager.endTransaction();
@@ -504,62 +498,58 @@ public class RefactorFacade {
 		} else if (element instanceof IClass) {
 			//
 			IClass c = (IClass) element;
-
+			System.out.println("Acessando classe "+c.getName());
 //			if (!c.getName().equalsIgnoreCase(className)){
 //				for (IClass nestedClasses : ((IClass) element).getNestedClasses()) {
 //					exportInterface0(nestedClasses, className);
 //				}
 //				return;
 //			}
-			
-			for (IClass nestedClasses : ((IClass) element).getNestedClasses()) {
-				exportInterface0(nestedClasses, className);
+			if(c.getName().equalsIgnoreCase(className)){
+				try {
+	
+		            // Begin transaction when creating or editing models
+		            TransactionManager.beginTransaction();
+	
+		            
+		            
+		            // Get model editor to create models in a class diagram
+		            BasicModelEditor basicModelEditor = ModelEditorFactory.getBasicModelEditor();
+		            
+		            System.out.println("Criando interface...");
+		            IClass iNewClass = basicModelEditor.createClass((IPackage)((IClass)element).getContainer(), "I"+c.getName());
+		            
+		            iNewClass.addStereotype("interface");
+		           
+		            for (IAttribute attribute : c.getAttributes()) {
+						basicModelEditor.createAttribute(iNewClass, attribute.getName(), attribute.getType());
+						basicModelEditor.delete(attribute);
+					}
+		            
+		            for (IOperation operation : c.getOperations()) {
+		            	basicModelEditor.createOperation(iNewClass, operation.getName(), operation.getReturnType());
+		            	basicModelEditor.delete(operation);
+					}
+		            
+		            basicModelEditor.createAssociation(c, iNewClass, "","","");
+		            
+		            // End transaction
+		            TransactionManager.endTransaction();
+	
+		            System.out.println("Finished");
+	
+		        } catch (ClassNotFoundException e) {
+		            e.printStackTrace();
+		        } catch (InvalidEditingException e) {
+		            // Abort transaction
+		            TransactionManager.abortTransaction();
+		            // Get an exception message
+		            System.err.println(e.getMessage());
+		            e.printStackTrace();
+		        } catch (Throwable e) {
+		            e.printStackTrace();   
+		        }
 			}
-
-			try {
-
-	            // Begin transaction when creating or editing models
-	            TransactionManager.beginTransaction();
-
-	            
-	            
-	            // Get model editor to create models in a class diagram
-	            BasicModelEditor basicModelEditor = ModelEditorFactory.getBasicModelEditor();
-	            
-	            
-	            IClass iNewClass = basicModelEditor.createClass((IPackage)((IClass)element).getContainer(), "I"+c.getName());
-	            
-	            iNewClass.addStereotype("interface");
-	            
-	            for (IAttribute attribute : c.getAttributes()) {
-					basicModelEditor.createAttribute(iNewClass, attribute.getName(), attribute.getType());
-					basicModelEditor.delete(attribute);
-				}
-	            
-	            for (IOperation operation : c.getOperations()) {
-	            	basicModelEditor.createOperation(iNewClass, operation.getName(), operation.getReturnType());
-	            	basicModelEditor.delete(operation);
-				}
-	            
-	            basicModelEditor.createAssociation(c, iNewClass, "","","");
-	            
-	            // End transaction
-	            TransactionManager.endTransaction();
-
-	            System.out.println("Finished");
-
-	        } catch (ClassNotFoundException e) {
-	            e.printStackTrace();
-	        } catch (InvalidEditingException e) {
-	            // Abort transaction
-	            TransactionManager.abortTransaction();
-	            // Get an exception message
-	            System.err.println(e.getMessage());
-	            e.printStackTrace();
-	        } catch (Throwable e) {
-	            e.printStackTrace();
-	            
-	        }
 		}
 	}
 
